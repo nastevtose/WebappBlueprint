@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth status)",
+      "Bash(git config --list)",
+      "Bash(ss -tlnp)",
+      "Bash(curl -s http://localhost:7070/)",
+      "Bash(curl -sv http://localhost:7070/)",
+      "Bash(ipconfig)",
+      "Bash(netstat:*)",
+      "Bash(netsh advfirewall:*)",
+      "Bash(ipconfig:*)",
+      "Bash(docker ps:*)",
+      "Bash(npm run test)",
+      "Bash(npm run build)",
+      "Bash(gh pr:*)",
+      "Bash(npm run deploy)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s \"https://ams204.greengeeks.net:2083/execute/Fileman/list_files?dir=%2Fpublic_html%2Fapps%2FWebAppBlueprint\" -H \"Authorization: cpanel cryptomk:FWWHD8FQCR1IYZYN2XU311ITWGU8EODA\")",
+      "Bash(python3 -c \":*)",
+      "Bash(curl -s -X POST \"https://ams204.greengeeks.net:2083/execute/Fileman/upload_files\" -H \"Authorization: cpanel cryptomk:FWWHD8FQCR1IYZYN2XU311ITWGU8EODA\" -F \"dir=/public_html/apps/WebAppBlueprint\" -F \"file-1=@dist/index.html\")",
+      "Bash(curl -s \"https://ams204.greengeeks.net:2083/execute/SubDomain/listsubdomains\" -H \"Authorization: cpanel cryptomk:FWWHD8FQCR1IYZYN2XU311ITWGU8EODA\")",
+      "Bash(curl -s \"https://ams204.greengeeks.net:2083/execute/DomainInfo/list_domains\" -H \"Authorization: cpanel cryptomk:FWWHD8FQCR1IYZYN2XU311ITWGU8EODA\")",
+      "Bash(curl -s \"https://ams204.greengeeks.net:2083/execute/Fileman/list_files?dir=%2F\" -H \"Authorization: cpanel cryptomk:FWWHD8FQCR1IYZYN2XU311ITWGU8EODA\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://webappblueprint.peder.mk/\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://webappblueprint.peder.mk/assets/index-CtCrLQgA.js\")",
+      "Bash(npm install --save-dev tweetsodium)",
+      "Bash(rm scripts/set-github-secrets.mjs)",
+      "Bash(npm uninstall tweetsodium)"
+    ]
+  }
+}
