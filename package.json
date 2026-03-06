@@ -3,10 +3,21 @@
   "version": "1.0.0",
   "description": "A project blueprint for creating web applications",
   "scripts": {
-    "install:deps": "echo \"[install] Installing dependencies...\" && exit 0",
-    "lint": "echo \"[lint] Linting code...\" && exit 0",
+    "dev": "vite",
+    "install:deps": "npm install",
+    "lint": "eslint src",
     "test": "echo \"[test] Running tests...\" && exit 0",
-    "build": "echo \"[build] Building application...\" && exit 0",
+    "build": "vite build",
+    "preview": "vite preview",
     "deploy": "echo \"[deploy] Deploying application...\" && exit 0"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.15.0",
+    "vite": "^6.0.1"
   }
 }

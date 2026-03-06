@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth status)",
+      "Bash(git config --list)",
+      "Bash(ss -tlnp)",
+      "Bash(curl -s http://localhost:7070/)",
+      "Bash(curl -sv http://localhost:7070/)",
+      "Bash(ipconfig)",
+      "Bash(netstat:*)",
+      "Bash(netsh advfirewall:*)",
+      "Bash(ipconfig:*)",
+      "Bash(docker ps:*)"
+    ]
+  }
+}
