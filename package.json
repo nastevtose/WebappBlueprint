@@ -1,0 +1,12 @@
+{
+  "name": "webapp-blueprint",
+  "version": "1.0.0",
+  "description": "A project blueprint for creating web applications",
+  "scripts": {
+    "install:deps": "echo \"[install] Installing dependencies...\" && exit 0",
+    "lint": "echo \"[lint] Linting code...\" && exit 0",
+    "test": "echo \"[test] Running tests...\" && exit 0",
+    "build": "echo \"[build] Building application...\" && exit 0",
+    "deploy": "echo \"[deploy] Deploying application...\" && exit 0"
+  }
+}
