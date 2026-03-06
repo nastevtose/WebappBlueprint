@@ -33,6 +33,7 @@ echo "→ Uploading index.html..."
 RESULT=$(curl -s -X POST "$API/Fileman/upload_files" \
   -H "$AUTH" \
   -F "dir=$REMOTE_DIR" \
+  -F "overwrite=1" \
   -F "file-1=@dist/index.html")
 echo "$RESULT" | grep -q '"status":1' || { echo "✗ Failed: $RESULT"; exit 1; }
 echo "  ✓ index.html"
@@ -45,6 +46,7 @@ JS_FILE=$(ls dist/assets/*.js | head -1)
 RESULT=$(curl -s -X POST "$API/Fileman/upload_files" \
   -H "$AUTH" \
   -F "dir=$REMOTE_DIR/assets" \
+  -F "overwrite=1" \
   -F "file-1=@$CSS_FILE" \
   -F "file-2=@$JS_FILE")
 echo "$RESULT" | grep -q '"status":1' || { echo "✗ Failed: $RESULT"; exit 1; }
