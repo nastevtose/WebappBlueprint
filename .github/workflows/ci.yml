@@ -77,7 +77,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.CPANEL_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.CPANEL_HOST }} >> ~/.ssh/known_hosts || true
 
       - name: Deploy
         run: npm run deploy
@@ -88,7 +88,7 @@ jobs:
           CPANEL_REMOTE_DIR: ${{ secrets.CPANEL_REMOTE_DIR }}
           CPANEL_API_DIR: ${{ secrets.CPANEL_API_DIR }}
           CPANEL_VENV_PATH: ${{ secrets.CPANEL_VENV_PATH }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CORS_ORIGINS: '["https://webappblueprint.peder.mk"]'
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
