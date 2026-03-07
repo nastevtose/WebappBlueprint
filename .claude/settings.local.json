@@ -39,7 +39,8 @@
       "Bash(api/.venv/Scripts/python.exe:*)",
       "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/ruff.exe\" format:*)",
       "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/ruff.exe\" check:*)",
-      "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/ruff.exe\":*)"
+      "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/ruff.exe\":*)",
+      "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/python.exe\":*)"
     ]
   }
 }
