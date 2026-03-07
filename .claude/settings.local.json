@@ -26,7 +26,15 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://webappblueprint.peder.mk/assets/index-CtCrLQgA.js\")",
       "Bash(npm install --save-dev tweetsodium)",
       "Bash(rm scripts/set-github-secrets.mjs)",
-      "Bash(npm uninstall tweetsodium)"
+      "Bash(npm uninstall tweetsodium)",
+      "Bash(uv sync:*)",
+      "Bash(where uv:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(curl:*)",
+      "Bash(docker-compose:*)",
+      "Bash(taskkill:*)"
     ]
   }
 }

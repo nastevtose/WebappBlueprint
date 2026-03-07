@@ -3,3 +3,27 @@ services:
     build: .
     ports:
       - "0.0.0.0:8080:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api/data:/data
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:////data/app.db
+      - CORS_ORIGINS=["http://localhost:8080"]
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - FRONTEND_URL=http://localhost:8080
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
