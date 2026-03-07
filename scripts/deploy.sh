@@ -6,16 +6,39 @@ if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
+CPANEL_TOKEN="${GG_API_TOKEN}"
 CPANEL_HOST="${CPANEL_HOST}"
 CPANEL_USER="${CPANEL_USER}"
 REMOTE_DIR="${CPANEL_REMOTE_DIR:-public_html/apps/WebAppBlueprint}"
 API_REMOTE_DIR="${CPANEL_API_DIR:-api_app}"
 VENV_PATH="${CPANEL_VENV_PATH:-virtualenv/${API_REMOTE_DIR}/3.12}"
-SSH_PORT="${SSH_PORT:-22}"
-SSH_CONN="${CPANEL_USER}@${CPANEL_HOST}"
-SSH_OPTS="-p $SSH_PORT -o StrictHostKeyChecking=no -o BatchMode=yes"
+API="https://$CPANEL_HOST:2083/execute"
+AUTH="Authorization: cpanel $CPANEL_USER:$CPANEL_TOKEN"
+CURL="curl -s --max-time 30"
 
-# ── 1. Build (skip if dist/ already exists, e.g. in CI) ──────────────────────
+upload_file() {
+  local remote_dir="$1"
+  local file="$2"
+  local field="${3:-file-1}"
+  RESULT=$($CURL -X POST "$API/Fileman/upload_files" \
+    -H "$AUTH" \
+    -F "dir=$remote_dir" \
+    -F "overwrite=1" \
+    -F "$field=@$file")
+  echo "$RESULT" | grep -q '"status":1' || { echo "✗ Failed uploading $file: $RESULT"; exit 1; }
+  echo "  ✓ $(basename $file)"
+}
+
+mkdir_remote() {
+  local path="$1"
+  local name="$2"
+  $CURL -X POST "$API/Fileman/mkdir" \
+    -H "$AUTH" \
+    --data-urlencode "path=/$path" \
+    --data-urlencode "name=$name" > /dev/null || true
+}
+
+# ── 1. Build ──────────────────────────────────────────────────────────────────
 if [ ! -d "dist" ]; then
   echo "→ Building..."
   npm run build
@@ -23,38 +46,66 @@ else
   echo "→ Skipping build (dist/ already exists)"
 fi
 
-# ── 2. Deploy frontend via rsync ──────────────────────────────────────────────
+# ── 2. Deploy frontend ────────────────────────────────────────────────────────
 echo "→ Deploying frontend..."
-ssh $SSH_OPTS "$SSH_CONN" "mkdir -p ~/$REMOTE_DIR"
-rsync -az --delete \
-  -e "ssh $SSH_OPTS" \
-  dist/ \
-  "$SSH_CONN:~/$REMOTE_DIR/"
-echo "  ✓ Frontend deployed"
+mkdir_remote "$REMOTE_DIR" "assets"
+upload_file "$REMOTE_DIR" "dist/index.html"
 
-# ── 3. Deploy API via rsync ───────────────────────────────────────────────────
+CSS_FILE=$(ls dist/assets/*.css | head -1)
+JS_FILE=$(ls dist/assets/*.js | head -1)
+RESULT=$($CURL -X POST "$API/Fileman/upload_files" \
+  -H "$AUTH" \
+  -F "dir=$REMOTE_DIR/assets" \
+  -F "overwrite=1" \
+  -F "file-1=@$CSS_FILE" \
+  -F "file-2=@$JS_FILE")
+echo "$RESULT" | grep -q '"status":1' || { echo "✗ Failed uploading assets: $RESULT"; exit 1; }
+echo "  ✓ $(basename $CSS_FILE)"
+echo "  ✓ $(basename $JS_FILE)"
+
+# ── 3. Deploy API files ───────────────────────────────────────────────────────
 echo "→ Deploying API..."
-ssh $SSH_OPTS "$SSH_CONN" "mkdir -p ~/$API_REMOTE_DIR/app/routers"
-rsync -az \
-  -e "ssh $SSH_OPTS" \
-  api/app \
-  api/passenger_wsgi.py \
-  api/requirements.txt \
-  "$SSH_CONN:~/$API_REMOTE_DIR/"
-echo "  ✓ API files synced"
+mkdir_remote "$API_REMOTE_DIR" "app"
+mkdir_remote "$API_REMOTE_DIR/app" "routers"
+mkdir_remote "$API_REMOTE_DIR" "tmp"
 
-# ── 4. Install dependencies & restart ────────────────────────────────────────
-echo "→ Installing dependencies & restarting..."
-ssh $SSH_OPTS "$SSH_CONN" bash << EOF
-  set -e
-  source ~/$VENV_PATH/bin/activate
-  pip install -q --upgrade pip
-  pip install -q -r ~/$API_REMOTE_DIR/requirements.txt
-  mkdir -p ~/$API_REMOTE_DIR/tmp
-  touch ~/$API_REMOTE_DIR/tmp/restart.txt
+upload_file "$API_REMOTE_DIR" "api/passenger_wsgi.py"
+upload_file "$API_REMOTE_DIR" "api/requirements.txt"
+
+for f in api/app/*.py; do
+  upload_file "$API_REMOTE_DIR/app" "$f"
+done
+
+for f in api/app/routers/*.py; do
+  upload_file "$API_REMOTE_DIR/app/routers" "$f"
+done
+
+# ── 4. Write .env to API dir ──────────────────────────────────────────────────
+echo "→ Writing API .env..."
+cat > /tmp/api.env << EOF
+DATABASE_URL=${DATABASE_URL}
+SECRET_KEY=${SECRET_KEY}
+GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+FRONTEND_URL=${FRONTEND_URL}
+CORS_ORIGINS=${CORS_ORIGINS}
 EOF
-echo "  ✓ Dependencies installed & app restarted"
+upload_file "$API_REMOTE_DIR" "/tmp/api.env"
+# rename .env (upload as api.env, move to .env)
+$CURL -X POST "$API/Fileman/rename" \
+  -H "$AUTH" \
+  --data-urlencode "destfile=.env" \
+  --data-urlencode "op=rename" \
+  --data-urlencode "sourcefiles=$API_REMOTE_DIR/api.env" > /dev/null || true
+
+# ── 5. Restart Passenger app ──────────────────────────────────────────────────
+echo "→ Restarting API..."
+echo "" > /tmp/restart.txt
+upload_file "$API_REMOTE_DIR/tmp" "/tmp/restart.txt"
 
 echo ""
 echo "✓ Frontend → https://webappblueprint.peder.mk"
 echo "✓ API      → https://api.webappblueprint.peder.mk"
+echo ""
+echo "Note: if this is first deploy, install dependencies manually in cPanel:"
+echo "  cPanel → Python App → $API_REMOTE_DIR → pip install -r requirements.txt"
