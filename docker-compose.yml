@@ -13,15 +13,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./api/data:/data
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:////data/app.db
-      - CORS_ORIGINS=["http://localhost:8080"]
-      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - DATABASE_URL=${DATABASE_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - SECRET_KEY=${SECRET_KEY}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - FRONTEND_URL=http://localhost:8080
+      - FRONTEND_URL=${FRONTEND_URL}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
