@@ -36,7 +36,9 @@ async def get_item(item_id: str, db: AsyncSession = Depends(get_db)) -> Item:
 
 
 @router.put("/items/{item_id}", response_model=ItemOut)
-async def update_item(item_id: str, body: ItemUpdate, db: AsyncSession = Depends(get_db)) -> Item:
+async def update_item(
+    item_id: str, body: ItemUpdate, db: AsyncSession = Depends(get_db)
+) -> Item:
     item = await db.get(Item, item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")

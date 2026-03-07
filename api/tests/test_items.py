@@ -15,7 +15,9 @@ async def test_list_items_empty(client: AsyncClient):
 
 
 async def test_create_item(client: AsyncClient):
-    res = await client.post("/api/items", json={"name": "Test Item", "description": "A test"})
+    res = await client.post(
+        "/api/items", json={"name": "Test Item", "description": "A test"}
+    )
     assert res.status_code == 201
     data = res.json()
     assert data["name"] == "Test Item"

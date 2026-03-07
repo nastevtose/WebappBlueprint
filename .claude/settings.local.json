@@ -34,7 +34,10 @@
       "Bash(docker-compose up:*)",
       "Bash(curl:*)",
       "Bash(docker-compose:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(uv run:*)",
+      "Bash(api/.venv/Scripts/python.exe:*)",
+      "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/ruff.exe\" format:*)"
     ]
   }
 }
