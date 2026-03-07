@@ -41,7 +41,14 @@
       "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/ruff.exe\" check:*)",
       "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/ruff.exe\":*)",
       "Bash(\"D:/Workspace/WebappBlueprint/api/.venv/Scripts/python.exe\":*)",
-      "Bash(do:*)"
+      "Bash(do:*)",
+      "Bash(nslookup:*)",
+      "Bash(/tmp/dotenv_upload:*)",
+      "Bash(\"$TEMP/dotenv_upload.txt\")",
+      "Bash(echo \"wrote to $TEMP\")",
+      "Read(//d/Workspace/WebappBlueprint/$TEMP/**)",
+      "Bash(\"D:/Workspace/WebappBlueprint/api_env_upload\":*)",
+      "Bash(echo:*)"
     ]
   }
 }

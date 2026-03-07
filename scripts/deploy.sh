@@ -11,7 +11,6 @@ CPANEL_HOST="${CPANEL_HOST}"
 CPANEL_USER="${CPANEL_USER}"
 REMOTE_DIR="${CPANEL_REMOTE_DIR:-public_html/apps/WebAppBlueprint}"
 API_REMOTE_DIR="${CPANEL_API_DIR:-api_app}"
-VENV_PATH="${CPANEL_VENV_PATH:-virtualenv/${API_REMOTE_DIR}/3.12}"
 API="https://$CPANEL_HOST:2083/execute"
 AUTH="Authorization: cpanel $CPANEL_USER:$CPANEL_TOKEN"
 CURL="curl -s --max-time 30"
@@ -82,7 +81,8 @@ done
 
 # ── 4. Write .env to API dir ──────────────────────────────────────────────────
 echo "→ Writing API .env..."
-cat > /tmp/api.env << EOF
+DOTENV_TMP="$(pwd)/.deploy_env_tmp"
+cat > "$DOTENV_TMP" << EOF
 DATABASE_URL=${DATABASE_URL}
 SECRET_KEY=${SECRET_KEY}
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
@@ -90,18 +90,27 @@ GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 FRONTEND_URL=${FRONTEND_URL}
 CORS_ORIGINS=${CORS_ORIGINS}
 EOF
-upload_file "$API_REMOTE_DIR" "/tmp/api.env"
-# rename .env (upload as api.env, move to .env)
-$CURL -X POST "$API/Fileman/rename" \
+RESULT=$($CURL -X POST "$API/Fileman/upload_files" \
   -H "$AUTH" \
-  --data-urlencode "destfile=.env" \
-  --data-urlencode "op=rename" \
-  --data-urlencode "sourcefiles=$API_REMOTE_DIR/api.env" > /dev/null || true
+  -F "dir=$API_REMOTE_DIR" \
+  -F "overwrite=1" \
+  -F "file-1=@${DOTENV_TMP};filename=.env")
+echo "$RESULT" | grep -q '"status":1' || { echo "✗ Failed uploading .env: $RESULT"; exit 1; }
+echo "  ✓ .env"
+rm -f "$DOTENV_TMP"
 
 # ── 5. Restart Passenger app ──────────────────────────────────────────────────
 echo "→ Restarting API..."
-echo "" > /tmp/restart.txt
-upload_file "$API_REMOTE_DIR/tmp" "/tmp/restart.txt"
+RESTART_TMP="$(pwd)/.deploy_restart_tmp"
+echo "" > "$RESTART_TMP"
+RESULT=$($CURL -X POST "$API/Fileman/upload_files" \
+  -H "$AUTH" \
+  -F "dir=$API_REMOTE_DIR/tmp" \
+  -F "overwrite=1" \
+  -F "file-1=@${RESTART_TMP};filename=restart.txt")
+echo "$RESULT" | grep -q '"status":1' || { echo "✗ Failed restarting: $RESULT"; exit 1; }
+echo "  ✓ Restarted"
+rm -f "$RESTART_TMP"
 
 echo ""
 echo "✓ Frontend → https://webappblueprint.peder.mk"
