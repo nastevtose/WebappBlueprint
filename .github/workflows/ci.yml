@@ -70,7 +70,7 @@ jobs:
           VITE_API_URL: https://api.webappblueprint.peder.mk
 
       - name: Generate API requirements
-        run: uv export --directory api --no-dev --no-hashes -o api/requirements.txt
+        run: cd api && uv export --no-dev --no-hashes -o requirements.txt
 
       - name: Deploy
         run: npm run deploy
