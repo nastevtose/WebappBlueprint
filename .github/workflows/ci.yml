@@ -69,8 +69,7 @@ jobs:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_REMOTE_DIR: ${{ secrets.CPANEL_REMOTE_DIR }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          CORS_ORIGINS: '["https://webappblueprint.peder.mk"]'
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          CORS_ORIGINS: '["https://${{ secrets.CPANEL_HOST }}"]'
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          FRONTEND_URL: https://webappblueprint.peder.mk
+          FRONTEND_URL: https://${{ secrets.CPANEL_HOST }}
