@@ -13,7 +13,7 @@ REMOTE_DIR="${CPANEL_REMOTE_DIR:-public_html/apps/WebAppBlueprint}"
 API_REMOTE_DIR="${CPANEL_API_DIR:-api_app}"
 API="https://$CPANEL_HOST:2083/execute"
 AUTH="Authorization: cpanel $CPANEL_USER:$CPANEL_TOKEN"
-CURL="curl -s --max-time 30"
+CURL="curl -s --max-time 30 -A 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'"
 
 upload_file() {
   local remote_dir="$1"
